@@ -1,0 +1,410 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Theme tokens (RGB triplets so Tailwind can apply /alpha) ───
+   Dark is the default cinematic night look; html.light switches to the daylight palette.
+   .force-dark pins a subtree to the night palette (captions over photography, navy banners). */
+:root,
+.force-dark {
+  --fg: 255 255 255;
+  --soft: 226 232 240;
+  --muted: 203 213 225;
+  --subtle: 148 163 184;
+  --page: 4 6 12;
+  --surface: 7 23 46;
+  --surface-2: 10 29 54;
+  --accent: 34 211 238;
+  --accent-soft: 103 232 249;
+  --accent-pale: 165 243 252;
+  --shadow: 0 0 0;
+  --cta: 34 211 238;
+  --on-cta: 2 6 23;
+  --brand-blue: #38BDF8;
+  /* How strongly hero / content veils cover the 3D world */
+  --veil: 1;
+}
+
+/* Daylight: sky-blue brand on airy blue-white, deep blue ink; the 3D city stays visible behind */
+html.light {
+  --fg: 8 28 54;
+  --soft: 22 44 74;
+  --muted: 45 68 98;
+  --subtle: 86 108 136;
+  --page: 236 244 251;
+  --surface: 255 255 255;
+  --surface-2: 224 236 248;
+  --accent: 2 132 199;
+  --accent-soft: 3 105 161;
+  --accent-pale: 7 89 133;
+  --shadow: 30 64 110;
+  --cta: 2 132 199;
+  --on-cta: 255 255 255;
+  --brand-blue: #0284C7;
+  --veil: 0.7;
+  color-scheme: light;
+}
+
+/* Serif italic accents in headlines: sky-blue in daylight */
+html.light h1 em,
+html.light h2 em,
+html.light h3 em {
+  color: #0EA5E9;
+}
+
+html.light .hud-label {
+  color: rgb(var(--accent));
+}
+
+/* Hero photography in daylight: cool blue-tinted print that lets the 3D skyline read through */
+html.light .hero-photo {
+  opacity: 0.3 !important;
+  mix-blend-mode: multiply !important;
+  filter: grayscale(0.5) contrast(1.05);
+}
+
+html { color-scheme: dark; }
+
+/* Official logo: navy wordmark reads white at night, original colours in daylight */
+.aasa-wordmark {
+  filter: brightness(0) invert(1);
+}
+
+html.light .aasa-wordmark {
+  filter: none;
+}
+
+.force-dark {
+  color: rgb(var(--fg));
+}
+
+:root {
+  --cream: rgb(var(--page));
+  --ink: rgb(var(--fg));
+  --cyan-glow: #00A6CE;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Smooth palette cross-fade when the theme is toggled (class added only during the switch) */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, fill 0.5s ease !important;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: rgb(var(--page));
+  color: rgb(var(--fg));
+  overflow-x: hidden;
+  font-family: var(--font-plus-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
+  scroll-behavior: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: rgb(var(--page));
+  color: rgb(var(--fg));
+  overflow-x: hidden;
+}
+
+/* ─── Typography Accents ─── */
+em {
+  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--brand-blue);
+}
+
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #FFFFFF 0%, #38BDF8 50%, #00A6CE 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-blue {
+  background: linear-gradient(135deg, #E2E8F0 0%, #38BDF8 60%, #0284C7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html.light .text-gradient-cyan {
+  background-image: linear-gradient(135deg, #082A4A 0%, #0EA5E9 55%, #0284C7 100%);
+}
+
+html.light .text-gradient-blue {
+  background-image: linear-gradient(135deg, #0F2F57 0%, #0EA5E9 60%, #1D4ED8 100%);
+}
+
+.hud-label {
+  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--brand-blue);
+}
+
+::selection {
+  background: rgba(0, 166, 206, 0.35);
+  color: #ffffff;
+}
+
+/* ─── Cinematic film grain over the whole frame ─── */
+.cinematic-grain {
+  /* Viewport-sized and animated via background-position: an oversized transformed layer
+     makes some compositors drop the whole frame to black */
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+  animation: grainShift 0.9s steps(6) infinite;
+}
+
+html.light .cinematic-grain {
+  opacity: 0.045;
+  mix-blend-mode: multiply;
+}
+
+@keyframes grainShift {
+  0% { background-position: 0 0; }
+  20% { background-position: -66px 44px; }
+  40% { background-position: 44px -88px; }
+  60% { background-position: -88px -22px; }
+  80% { background-position: 66px 66px; }
+  100% { background-position: 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-grain { animation: none; }
+}
+
+/* ─── Ultra-Glassmorphism Cards (Dark Luxury Theme) ─── */
+.glass-panel {
+  position: relative;
+  background: linear-gradient(180deg, rgba(14, 26, 46, 0.62) 0%, rgba(6, 12, 24, 0.72) 100%);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 24px 60px -20px rgba(0, 0, 0, 0.7),
+    0 2px 8px -2px rgba(0, 0, 0, 0.25);
+  transition: all 0.35s var(--ease-out-expo);
+}
+
+.glass-panel:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 20px 45px -8px rgba(0, 166, 206, 0.25), 0 0 25px rgba(56, 189, 248, 0.12);
+  transform: translateY(-3px);
+}
+
+.glass-panel-active {
+  background: rgba(14, 38, 70, 0.85);
+  border-color: #38BDF8;
+  box-shadow: 0 0 35px rgba(0, 166, 206, 0.3);
+}
+
+/* Daylight glass: frosted porcelain with a crisp top edge */
+html.light .glass-panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.66) 0%, rgba(240, 248, 255, 0.5) 100%);
+  border-color: rgba(14, 165, 233, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 24px 60px -24px rgba(12, 74, 140, 0.28),
+    0 2px 8px -2px rgba(12, 74, 140, 0.08);
+}
+
+html.light .glass-panel:hover {
+  border-color: rgba(14, 165, 233, 0.5);
+  box-shadow: 0 24px 50px -16px rgba(14, 165, 233, 0.3), 0 0 0 1px rgba(14, 165, 233, 0.1);
+}
+
+html.light .glass-panel-active {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: #0EA5E9;
+  box-shadow: 0 0 35px rgba(14, 165, 233, 0.22);
+}
+
+/* ─── Buttons ─── */
+.btn-primary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.8rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #38BDF8 0%, #00A6CE 100%);
+  color: #040A14;
+  font-family: var(--font-plus-jakarta), 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 166, 206, 0.4);
+  transition: all 0.35s var(--ease-out-expo);
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 15px 35px -5px rgba(56, 189, 248, 0.6);
+  background: #FFFFFF;
+  color: #040A14;
+}
+
+.btn-ghost {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.8rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  color: #F8FAFC;
+  font-family: var(--font-plus-jakarta), 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.35s var(--ease-out-expo);
+  cursor: pointer;
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #38BDF8;
+  color: #38BDF8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.2);
+}
+
+html.light .btn-primary {
+  background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%);
+  color: #FFFFFF;
+  box-shadow: 0 14px 30px -12px rgba(2, 132, 199, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+html.light .btn-primary:hover {
+  background: linear-gradient(135deg, #0EA5E9 0%, #0369A1 100%);
+  color: #FFFFFF;
+  box-shadow: 0 18px 36px -12px rgba(3, 105, 161, 0.6);
+}
+
+html.light .btn-ghost {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(2, 132, 199, 0.28);
+  color: #082A4A;
+  box-shadow: 0 2px 6px rgba(12, 74, 140, 0.08);
+}
+
+html.light .btn-ghost:hover {
+  background: #FFFFFF;
+  border-color: #0EA5E9;
+  color: #0284C7;
+}
+
+/* ─── Custom Magnetic Cursor ─── */
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background-color: #00A6CE;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px rgba(0, 166, 206, 0.6);
+}
+
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid rgb(var(--fg) / 0.35);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s, background-color 0.3s, border-color 0.3s;
+}
+
+.cursor-ring.active {
+  width: 80px;
+  height: 80px;
+  background-color: rgba(0, 166, 206, 0.12);
+  border-color: #00A6CE;
+  backdrop-filter: blur(2px);
+}
+
+.cursor-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgb(var(--fg));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.cursor-ring.active .cursor-label {
+  opacity: 1;
+}
+
+/* ─── Scroll Progress ─── */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #38BDF8, #00A6CE, #0284C7);
+  z-index: 100;
+  transform-origin: left;
+  transition: transform 0.1s linear;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgb(var(--page));
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--fg) / 0.18);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00A6CE;
+}
+
+/* Unit wordmarks from aasa.ae are white-on-transparent: keep white at night, ink in daylight */
+html.light .unit-logo {
+  filter: brightness(0) saturate(100%) invert(11%) sepia(46%) saturate(2400%) hue-rotate(196deg) brightness(92%);
+}
+
+/* Splash already seen this session: never paint it, not even for the first server-rendered frame */
+html.intro-seen [data-preloader] {
+  display: none;
+}
